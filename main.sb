@@ -1,0 +1,67 @@
+﻿
+XIncludeFile "bitmapfont.sb"
+
+OpenWindow(0, 20, 20, 840, 640, "A screen in a window...", #PB_Window_SystemMenu | #PB_Window_ScreenCentered)
+
+OpenWindowedScreen(WindowID(0), 20, 20, 800, 600)
+
+
+Global bitmapFont
+
+UseModule BitmapFonts
+
+Procedure RenderFrame()
+  Static x
+  
+  ClearScreen(RGB(127, 127, 127))
+    
+  x+1
+  If x>600 : x = 0 : EndIf
+  DisplaySprite(0, x, 30)
+  
+  Protected y
+  
+  For y = 0 To 600 Step 24
+    DisplayText(bitmapFont, "Test " + y, 100, y)
+  Next
+  
+  FlipBuffers() ; continue the rendering
+EndProcedure
+
+
+Procedure onFontLoaded(BitmapFontID.i, errMsg.s)
+  
+  If errMsg
+    Debug("Unable to load font: " + errMsg)
+    ProcedureReturn
+  EndIf
+  
+  
+  ; Register the render event so FlipBuffers() will trigger the associated procedure
+  BindEvent(#PB_Event_RenderFrame, @RenderFrame())
+  
+  CreateSprite(0, 64, 64)
+  If StartDrawing(SpriteOutput(0))
+    Circle(32, 32, 25, RGB(255, 0, 0)) ; Red circle
+    StopDrawing()
+  EndIf
+  
+  FlipBuffers() ; trigger the rendering
+  
+EndProcedure
+
+Procedure main()  
+  ;bitmapFont = LoadBitmapFont("data/font_bitmap.png", 32, 32, @onFontLoaded())
+  bitmapFont = LoadBitmapFont("data/tom-thumb-new-trans.png", 16, 24, @onFontLoaded())
+  
+EndProcedure
+
+main()
+
+; IDE Options = SpiderBasic 1.30 (Linux - x64)
+; CursorPosition = 23
+; FirstLine = 7
+; Folding = -
+; EnableUnicode
+; EnableXP
+; CompileSourceDirectory

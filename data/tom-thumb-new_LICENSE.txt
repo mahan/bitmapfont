@@ -1,0 +1,8 @@
+MIT
+
+Origin: http://robey.lag.net/2010/01/23/tiny-monospace-font.html
+
+Converted to transparent background with ImageMagick:
+
+convert tom-thumb-new.png -transparent white tom-thumb-new-trans.png 
+

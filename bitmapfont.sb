@@ -1,0 +1,120 @@
+﻿; --------------------------------------------------------------------------------------------------------
+; Synopsis: Bitmap font loader and Screen text renderer for SpiderBasic.
+; Author: Mattias Hansson (https://github.com/mahan)
+; License: Public Domain
+; Other: Mentions are welcome but not necessary
+; --------------------------------------------------------------------------------------------------------
+
+DeclareModule BitmapFonts
+  EnableExplicit
+  
+  Prototype OnBitmapFontLoaded(BitmapFontID.i, errMsg.s)
+  
+  ; Load bitmap font to memory. The value returned is the id of the font.
+  Declare.i LoadBitmapFont(fontFilename.s, charWidth.i, charHeigth.i, onBitmapFontLoaded.OnBitmapFontLoaded)
+  ; Draw a text to the current screen using the specified font.
+  Declare DisplayText(FontID.i, text.s, x.i, y.i)
+  
+EndDeclareModule
+
+
+Module BitmapFonts
+  EnableExplicit
+  
+  Global FontIDCounter = 0
+  
+  Structure FontChar
+    x.i
+    y.i
+  EndStructure
+  
+  Structure Font
+    sprite.i
+    filename.s
+    w.i
+    h.i
+    chars.FontChar[256]
+    onBitmapFontLoaded.OnBitmapFontLoaded
+  EndStructure
+  
+  Global NewMap _fonts.Font()
+  Global NewMap _fontFilenameToFontID.i()
+  
+  Procedure InitializeFontStructure(FontID.i)
+    If Not FindMapElement(_fonts(), Str(FontID)) : ProcedureReturn : EndIf
+        
+    Protected x, y, sw, sh, cw, ch, charIdx
+    charIdx = 0
+    cw = _fonts()\w
+    ch = _fonts()\h
+    sw = SpriteWidth(_fonts()\sprite)
+    sh = SpriteHeight(_fonts()\sprite)
+    y = 0
+    While y < sh
+      x = 0
+      While x < sw
+        _fonts()\chars[charIdx]\x = x
+        _fonts()\chars[charIdx]\y = y
+        charIdx+1
+        If charIdx > 255 : ProcedureReturn : EndIf
+        ;Debug "charIdx: " + charIdx + " x: " + x + " y: " + y
+        x=x+cw
+      Wend
+      y=y+ch
+    Wend
+  EndProcedure
+  
+  Procedure FontSpriteLoaded(Type, Filename$, ObjectId)
+    If FindMapElement(_fontFilenameToFontID(), Filename$)
+      FindMapElement(_fonts(), Str(_fontFilenameToFontID()))
+      InitializeFontStructure(_fontFilenameToFontID())
+      _fonts()\onBitmapFontLoaded(_fontFilenameToFontID(), "")
+    EndIf
+  EndProcedure
+
+  Procedure FontSpriteLoadError(Type, Filename$, ObjectId)
+    If FindMapElement(_fontFilenameToFontID(), Filename$)
+      FindMapElement(_fonts(), Str(_fontFilenameToFontID()))
+      _fonts()\onBitmapFontLoaded(_fontFilenameToFontID(), "BitmapFonts - unable to load " + Filename$)
+    EndIf
+  EndProcedure
+
+  Procedure.i LoadBitmapFont(fontFilename.s, charWidth.i, charHeigth.i, onBitmapFontLoaded.OnBitmapFontLoaded)
+    FontIDCounter+1
+    AddMapElement(_fonts(), Str(FontIDCounter))
+    _fonts()\filename = fontFilename
+    _fonts()\w = charWidth
+    _fonts()\h = charHeigth
+    _fonts()\onBitmapFontLoaded = onBitmapFontLoaded
+    AddMapElement(_fontFilenameToFontID(), fontFilename)
+    _fontFilenameToFontID() = FontIDCounter
+    BindEvent(#PB_Event_Loading, @FontSpriteLoaded())
+    BindEvent(#PB_Event_LoadingError, @FontSpriteLoadError())
+    _fonts()\sprite = LoadSprite(#PB_Any, fontFilename)
+    ProcedureReturn FontIDCounter
+  EndProcedure
+  
+  Procedure DisplayText(FontID.i, text.s, x.i, y.i)
+    If Not FindMapElement(_fonts(), Str(FontID)) : ProcedureReturn : EndIf
+    
+    Protected i, xp, c
+    xp = x
+    For i = 1 To Len(text)
+      c = Asc(Mid(text, i, 1))
+      ;Debug Str(i) + ": " + Asc(Mid(text, i, 1))
+      ;Debug Str(_fonts()\chars[c]\x) + ", " + Str(_fonts()\chars[c]\y) + ", " + Str(_fonts()\w) + ", " + Str(_fonts()\h)
+      ClipSprite(_fonts()\sprite, _fonts()\chars[c]\x, _fonts()\chars[c]\y, _fonts()\w, _fonts()\h)
+      DisplayTransparentSprite(_fonts()\sprite, xp, y)
+      xp = xp + _fonts()\w
+    Next
+    
+  EndProcedure
+  
+EndModule
+
+; IDE Options = SpiderBasic 1.30 (Linux - x64)
+; CursorPosition = 3
+; Folding = --
+; EnableUnicode
+; EnableXP
+; CompileSourceDirectory

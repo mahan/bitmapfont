@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://www.purebasic.com/namespace" version="1.0" creator="SpiderBasic 1.30 (Linux - x64)">
+  <section name="config">
+    <options closefiles="1" openmode="0" name="Bipmap Font Project"/>
+  </section>
+  <section name="data">
+    <explorer view="../../../" pattern="0"/>
+    <log show="1"/>
+    <lastopen date="2016-05-17 08:24" user="hz" host="hpstream11"/>
+  </section>
+  <section name="files">
+    <file name="bitmapfont.sb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
+      <fingerprint md5="6ef3e03c1c53a20accf5ebb9048fa479"/>
+    </file>
+    <file name="main.sb">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
+      <fingerprint md5="e1543c11959ac221d8c28dcb6bf6c2ec"/>
+    </file>
+  </section>
+  <section name="targets">
+    <target name="Default Target" enabled="1" default="1">
+      <inputfile value="main.sb"/>
+      <outputfile value=""/>
+      <options unicode="1" xpskin="1" debug="1" optimizejs="0" webserveraddress="" windowtheme="" gadgettheme=""/>
+      <export htmlfilename="" javascriptfilename="" javascriptpath="" copyjavascriptlibrary="0" exportcommandline="" exportarguments=""/>
+      <temporaryexe value="source"/>
+    </target>
+  </section>
+</project>
